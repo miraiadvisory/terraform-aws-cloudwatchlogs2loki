@@ -33,6 +33,43 @@ resource "aws_security_group" "this_security_group" {
   }
 }
 
+resource "aws_iam_role_policy" "lambda_loki_execution_policy" {
+  name   = "${var.name}_lambda_loki_execution_policy"
+  role   = aws_iam_role.lambda_loki_execution_role.id
+  policy = <<EOF
+{
+  "Version": "2012-10-17",
+  "Statement": [
+    {
+      "Effect": "Allow",
+      "Action": [
+        "logs:CreateLogGroup",
+        "logs:CreateLogStream",
+        "logs:PutLogEvents"
+      ],
+      "Resource": [
+        "arn:aws:logs:*:*:*"
+      ]
+    },
+    {
+      "Effect": "Allow",
+      "Action": "es:ESHttpPost",
+      "Resource": "arn:aws:es:*:*:*"
+    },
+    {
+      "Effect": "Allow",
+      "Action": [
+        "ec2:CreateNetworkInterface",
+        "ec2:DescribeNetworkInterfaces",
+        "ec2:DeleteNetworkInterface"
+      ],
+      "Resource": "*"
+    }
+  ]
+}
+EOF
+}
+
 resource "aws_lambda_function" "promtail_lambda_test" {
   filename         = "${path.module}/lambda-promtail.zip"
   function_name    = var.name
