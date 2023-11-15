@@ -16,6 +16,23 @@ resource "aws_iam_role" "lambda_loki_execution_role" {
 }
 EOF
 }
+
+resource "aws_security_group" "this_security_group" {
+  name        = "${var.name}_lambda_sg"
+  description = "Allow outbound traffic fom this Lambda"
+  vpc_id      = var.vpc_id
+
+  egress {
+    from_port   = 0
+    to_port     = 0
+    protocol    = "-1"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+
+  tags = {
+  }
+}
+
 resource "aws_lambda_function" "promtail_lambda_test" {
   filename         = "${path.module}/lambda-promtail.zip"
   function_name    = var.name
