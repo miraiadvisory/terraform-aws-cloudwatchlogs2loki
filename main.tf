@@ -1,3 +1,21 @@
+
+resource "aws_iam_role" "lambda_loki_execution_role" {
+  name               = "${var.name}_lambda_execution_role"
+  assume_role_policy = <<EOF
+{
+  "Version": "2012-10-17",
+  "Statement": [
+    {
+      "Action": "sts:AssumeRole",
+      "Principal": {
+        "Service": "lambda.amazonaws.com"
+      },
+      "Effect": "Allow"
+    }
+  ]
+}
+EOF
+}
 resource "aws_lambda_function" "promtail_lambda_test" {
   filename         = "${path.module}/lambda-promtail.zip"
   function_name    = var.name
@@ -20,3 +38,5 @@ resource "aws_lambda_function" "promtail_lambda_test" {
   #   }
   # }
 }
+
+
