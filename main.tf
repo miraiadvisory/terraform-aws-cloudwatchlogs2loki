@@ -70,7 +70,7 @@ resource "aws_iam_role_policy" "lambda_loki_execution_policy" {
 EOF
 }
 
-resource "aws_lambda_function" "promtail_lambda_test" {
+resource "aws_lambda_function" "promtail_lambda" {
   filename         = "${path.module}/lambda-promtail.zip"
   function_name    = var.name
   role             = aws_iam_role.lambda_loki_execution_role.arn
@@ -93,4 +93,18 @@ resource "aws_lambda_function" "promtail_lambda_test" {
   # }
 }
 
+resource "aws_lambda_permission" "loki_allow" {
+  statement_id  = "loki_allow"
+  action        = "lambda:InvokeFunction"
+  function_name = aws_lambda_function.promtail_lambda.arn
+  principal     = var.log_endpoint
+  source_arn    = "${data.aws_cloudwatch_log_group.loggroup.arn}:*"
+}
 
+resource "aws_cloudwatch_log_subscription_filter" "cloudwatch_logs_to_loki" {
+  depends_on      = [aws_lambda_permission.cloudwatch_allow]
+  name            = "${var.name}_cloudwatch_logs_to_loki"
+  log_group_name  = data.aws_cloudwatch_log_group.loggroup.name
+  filter_pattern  = ""
+  destination_arn = aws_lambda_function.promtail_lambda.arn
+}
