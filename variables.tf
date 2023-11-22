@@ -2,16 +2,16 @@ variable "vpc_id" {
   type = string
 }
 
-variable "es_endpoint" {
+variable "loki_endpoint" {
   type = string
 }
 
-variable "cwl_endpoint" {
+variable "log_endpoint" {
   type    = string
   default = "logs.eu-west-1.amazonaws.com"
 }
 
-variable "es_index_prefix" {
+variable "loki_index_prefix" {
   type    = string
   default = ""
 }
