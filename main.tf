@@ -102,7 +102,7 @@ resource "aws_lambda_permission" "loki_allow" {
 }
 
 resource "aws_cloudwatch_log_subscription_filter" "cloudwatch_logs_to_loki" {
-  depends_on      = [aws_lambda_permission.cloudwatch_allow]
+  depends_on      = [aws_lambda_permission.loki_allow]
   name            = "${var.name}_cloudwatch_logs_to_loki"
   log_group_name  = data.aws_cloudwatch_log_group.loggroup.name
   filter_pattern  = ""
