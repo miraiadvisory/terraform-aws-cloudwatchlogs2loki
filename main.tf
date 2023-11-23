@@ -1,4 +1,6 @@
-
+#-------------------------------------------------------------------------------
+# IAM role assigned to the lambda function
+#-------------------------------------------------------------------------------
 resource "aws_iam_role" "lambda_loki_execution_role" {
   name               = "${var.name}_lambda_execution_role"
   assume_role_policy = <<EOF
@@ -17,21 +19,21 @@ resource "aws_iam_role" "lambda_loki_execution_role" {
 EOF
 }
 
-resource "aws_security_group" "this_security_group" {
-  name        = "${var.name}_lambda_sg"
-  description = "Allow outbound traffic fom this Lambda"
-  vpc_id      = var.vpc_id
+#-------------------------------------------------------------------------------
+# IAM policy assigned to lambda IAM role to be able to execute in VPC
+#-------------------------------------------------------------------------------
 
-  egress {
-    from_port   = 0
-    to_port     = 0
-    protocol    = "-1"
-    cidr_blocks = ["0.0.0.0/0"]
-  }
-
-  tags = {
-  }
+resource "aws_iam_role_policy_attachment" "lambda_loki_execution_policy" {
+  role       = aws_iam_role.lambda_loki_execution_role.id
+  policy_arn = data.aws_iam_policy.lambda_vpc_execution[0].arn
 }
+data "aws_iam_policy" "lambda_vpc_execution" {
+  name = "AWSLambdaVPCAccessExecutionRole"
+}
+
+#-------------------------------------------------------------------------------
+# IAM policies attached to lambda IAM role
+#-------------------------------------------------------------------------------
 
 resource "aws_iam_role_policy" "lambda_loki_execution_policy" {
   name   = "${var.name}_lambda_loki_execution_policy"
@@ -70,6 +72,10 @@ resource "aws_iam_role_policy" "lambda_loki_execution_policy" {
 EOF
 }
 
+#-------------------------------------------------------------------------------
+# Lambda function
+#-------------------------------------------------------------------------------
+
 resource "aws_lambda_function" "promtail_lambda" {
   filename         = "${path.module}/lambda-promtail.zip"
   function_name    = var.name
@@ -78,25 +84,50 @@ resource "aws_lambda_function" "promtail_lambda" {
   source_code_hash = filebase64sha256("${path.module}/lambda-promtail.zip")
   runtime          = "go1.x"
 
-  # vpc_config {
-  #   subnet_ids         = var.subnets
-  #   security_group_ids = var.security_group_ids
-  #   ###security_group_ids = [aws_security_group.this_security_group.id]
-  # }
+  vpc_config {
+    subnet_ids         = var.subnets
+    security_group_ids = var.security_group_ids
+    ###security_group_ids = [aws_security_group.this_security_group.id]
+  }
 
-  # environment {
-  #   variables = {
-  #     es_endpoint        = var.es_endpoint
-  #     es_index_prefix    = var.es_index_prefix
-  #     cwl_logstream_name = var.cwl_logstream_name
-  #   }
-  # }
+  environment {
+    variables = {
+      LOKI_ENDPOINT      = var.loki_endpoint
+      LOKI_INDEX_PREFIX  = var.loki_index_prefix
+      CWL_LOGSTREAM_NAME = var.cwl_logstream_name
+      BEARER_TOKEN       = var.bearer_token
+    }
+  }
 }
 
+#-------------------------------------------------------------------------------
+# Lambda outbound traffic
+#-------------------------------------------------------------------------------
+
+resource "aws_security_group" "this_security_group" {
+  name        = "${var.name}_lambda_sg"
+  description = "Allow outbound traffic fom this Lambda"
+  vpc_id      = var.vpc_id
+
+  egress {
+    from_port   = 0
+    to_port     = 0
+    protocol    = "-1"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+
+  tags = {
+  }
+}
+
+#-------------------------------------------------------------------------------
+# Subscribe to CloudWatch log-groups
+#-------------------------------------------------------------------------------
+
 resource "aws_lambda_permission" "loki_allow" {
-  statement_id  = "loki_allow"
+  statement_id  = "loki-allow"
   action        = "lambda:InvokeFunction"
-  function_name = aws_lambda_function.promtail_lambda.arn
+  function_name = aws_lambda_function.promtail_lambda
   principal     = var.log_endpoint
   source_arn    = "${data.aws_cloudwatch_log_group.loggroup.arn}:*"
 }

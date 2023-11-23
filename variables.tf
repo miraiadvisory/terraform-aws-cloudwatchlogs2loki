@@ -16,9 +16,41 @@ variable "loki_index_prefix" {
   default = ""
 }
 
+variable "write_address" {
+  type        = string
+  description = "This is the Loki Write API compatible endpoint that you want to write logs to, either promtail or Loki."
+  default     = "http://localhost:8080/loki/api/v1/push"
+}
+
 variable "cwl_logstream_name" {
   type    = string
   default = ""
+}
+
+variable "log_group_names" {
+  type        = set(string)
+  description = "List of CloudWatch Log Group names to create Subscription Filters for."
+  default     = []
+}
+
+variable "username" {
+  type        = string
+  description = "The basic auth username, necessary if writing directly to Grafana Cloud Loki."
+  default     = ""
+}
+
+variable "password" {
+  type        = string
+  description = "The basic auth password, necessary if writing directly to Grafana Cloud Loki."
+  sensitive   = true
+  default     = ""
+}
+
+variable "bearer_token" {
+  type        = string
+  description = "The bearer token, necessary if target endpoint requires it."
+  sensitive   = true
+  default     = ""
 }
 
 variable "cloudwatch_loggroup_name" {
