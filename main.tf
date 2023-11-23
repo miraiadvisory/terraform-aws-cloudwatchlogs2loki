@@ -96,6 +96,8 @@ resource "aws_lambda_function" "promtail_lambda" {
       LOKI_INDEX_PREFIX  = var.loki_index_prefix
       CWL_LOGSTREAM_NAME = var.cwl_logstream_name
       BEARER_TOKEN       = var.bearer_token
+      USERNAME           = var.username
+      PASSWORD           = var.password
     }
   }
 }
@@ -128,7 +130,7 @@ resource "aws_lambda_permission" "loki_allow" {
   statement_id  = "loki-allow"
   action        = "lambda:InvokeFunction"
   function_name = aws_lambda_function.promtail_lambda
-  principal     = var.log_endpoint
+  principal     = "logs.${data.aws_region.current.name}.amazonaws.com"
   source_arn    = "${data.aws_cloudwatch_log_group.loggroup.arn}:*"
 }
 
