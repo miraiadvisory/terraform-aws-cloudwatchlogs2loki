@@ -2,21 +2,12 @@ variable "vpc_id" {
   type = string
 }
 
-variable "loki_endpoint" {
-  type = string
-}
-
-variable "log_endpoint" {
-  type    = string
-  default = "logs.eu-west-1.amazonaws.com"
-}
-
 variable "loki_index_prefix" {
   type    = string
   default = ""
 }
 
-variable "write_address" {
+variable "loki_endpoint" {
   type        = string
   description = "This is the Loki Write API compatible endpoint that you want to write logs to, either promtail or Loki."
   default     = "http://localhost:8080/loki/api/v1/push"
