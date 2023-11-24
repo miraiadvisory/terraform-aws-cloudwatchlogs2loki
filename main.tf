@@ -25,7 +25,7 @@ EOF
 
 resource "aws_iam_role_policy_attachment" "lambda_loki_execution_policy" {
   role       = aws_iam_role.lambda_loki_execution_role.id
-  policy_arn = data.aws_iam_policy.lambda_vpc_execution[0].arn
+  policy_arn = data.aws_iam_policy.lambda_vpc_execution.arn
 }
 data "aws_iam_policy" "lambda_vpc_execution" {
   name = "AWSLambdaVPCAccessExecutionRole"
@@ -125,6 +125,10 @@ resource "aws_security_group" "this_security_group" {
 #-------------------------------------------------------------------------------
 # Subscribe to CloudWatch log-groups
 #-------------------------------------------------------------------------------
+
+data "aws_cloudwatch_log_group" "loggroup" {
+  name = var.cloudwatch_loggroup_name
+}
 
 resource "aws_lambda_permission" "loki_allow" {
   statement_id  = "loki-allow"
