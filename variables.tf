@@ -53,8 +53,9 @@ variable "cloudwatch_loggroup_retention" {
   default = 30
 }
 
-variable "name" {
-  type = string
+variable "function_name" {
+  description = "Name of the Lambda function"
+  type        = string
 }
 
 variable "subnets" {

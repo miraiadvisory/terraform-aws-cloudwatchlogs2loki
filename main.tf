@@ -2,7 +2,7 @@
 # IAM role assigned to the lambda function
 #-------------------------------------------------------------------------------
 resource "aws_iam_role" "lambda_loki_execution_role" {
-  name               = "${var.name}_lambda_execution_role"
+  name               = "${var.function_name}_lambda_execution_role"
   assume_role_policy = <<EOF
 {
   "Version": "2012-10-17",
@@ -36,7 +36,7 @@ data "aws_iam_policy" "lambda_vpc_execution" {
 #-------------------------------------------------------------------------------
 
 resource "aws_iam_role_policy" "lambda_loki_execution_policy" {
-  name   = "${var.name}_lambda_loki_execution_policy"
+  name   = "${var.function_name}_lambda_loki_execution_policy"
   role   = aws_iam_role.lambda_loki_execution_role.id
   policy = <<EOF
 {
@@ -78,7 +78,7 @@ EOF
 
 resource "aws_lambda_function" "promtail_lambda" {
   filename         = "${path.module}/lambda-promtail.zip"
-  function_name    = var.name
+  function_name    = var.function_name
   role             = aws_iam_role.lambda_loki_execution_role.arn
   handler          = "lambda-promtail"
   source_code_hash = filebase64sha256("${path.module}/lambda-promtail.zip")
@@ -107,7 +107,7 @@ resource "aws_lambda_function" "promtail_lambda" {
 #-------------------------------------------------------------------------------
 
 resource "aws_security_group" "this_security_group" {
-  name        = "${var.name}_lambda_sg"
+  name        = "${var.function_name}_lambda_sg"
   description = "Allow outbound traffic fom this Lambda"
   vpc_id      = var.vpc_id
 
@@ -136,7 +136,7 @@ data "aws_region" "current" {
 resource "aws_lambda_permission" "loki_allow" {
   statement_id  = "loki-allow"
   action        = "lambda:InvokeFunction"
-  function_name = aws_lambda_function.promtail_lambda
+  function_name = var.function_name
   principal     = "logs.${data.aws_region.current.name}.amazonaws.com"
   source_arn    = "${data.aws_cloudwatch_log_group.loggroup.arn}:*"
 }
