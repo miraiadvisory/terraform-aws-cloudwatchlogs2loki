@@ -130,6 +130,9 @@ data "aws_cloudwatch_log_group" "loggroup" {
   name = var.cloudwatch_loggroup_name
 }
 
+data "aws_region" "current" {
+}
+
 resource "aws_lambda_permission" "loki_allow" {
   statement_id  = "loki-allow"
   action        = "lambda:InvokeFunction"
