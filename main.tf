@@ -80,7 +80,7 @@ resource "aws_lambda_function" "promtail_lambda" {
   filename         = "${path.module}/main.zip"
   function_name    = var.function_name
   role             = aws_iam_role.lambda_loki_execution_role.arn
-  handler          = "lambda-promtail"
+  handler          = "main"
   source_code_hash = filebase64sha256("${path.module}/main.zip")
   runtime          = "go1.x"
 
