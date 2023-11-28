@@ -83,6 +83,7 @@ resource "aws_lambda_function" "promtail_lambda" {
   handler          = "main"
   source_code_hash = filebase64sha256("${path.module}/main.zip")
   runtime          = "go1.x"
+  timeout          = var.timeout
 
   vpc_config {
     subnet_ids         = var.subnets

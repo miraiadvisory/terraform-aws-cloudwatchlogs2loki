@@ -65,3 +65,8 @@ variable "subnets" {
 variable "security_group_ids" {
   type = list(string)
 }
+
+variable "timeout" {
+  description = "Lambda function timeout in seconds"
+  default     = 60
+}
