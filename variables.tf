@@ -44,6 +44,18 @@ variable "bearer_token" {
   default     = ""
 }
 
+variable "keep_stream" {
+  type        = string
+  description = "Determines whether to keep the CloudWatch Log Stream value as a Loki label when writing logs from lambda-promtail."
+  default     = "false"
+}
+
+variable "extra_labels" {
+  type        = string
+  description = "Comma separated list of extra labels, in the format 'name1,value1,name2,value2,...,nameN,valueN' to add to entries forwarded by lambda-promtail."
+  default     = ""
+}
+
 variable "cloudwatch_loggroup_name" {
   type = string
 }
@@ -64,6 +76,7 @@ variable "subnets" {
 
 variable "security_group_ids" {
   type = list(string)
+  default = 
 }
 
 variable "timeout" {
