@@ -97,6 +97,8 @@ resource "aws_lambda_function" "promtail_lambda" {
       LOKI_INDEX_PREFIX  = var.loki_index_prefix
       CWL_LOGSTREAM_NAME = var.cwl_logstream_name
       BEARER_TOKEN       = var.bearer_token
+      KEEP_STREAM        = var.keep_stream
+      EXTRA_LABELS       = var.extra_labels
       USERNAME           = var.username
       PASSWORD           = var.password
     }
