@@ -92,7 +92,7 @@ resource "aws_lambda_function" "promtail_lambda" {
 
   environment {
     variables = {
-      LOKI_ENDPOINT      = var.loki_endpoint
+      WRITE_ADDRESS      = var.loki_endpoint
       LOKI_INDEX_PREFIX  = var.loki_index_prefix
       CWL_LOGSTREAM_NAME = var.cwl_logstream_name
       BEARER_TOKEN       = var.bearer_token
