@@ -82,7 +82,7 @@ resource "aws_lambda_function" "promtail_lambda" {
   role             = aws_iam_role.lambda_loki_execution_role.arn
   handler          = "main"
   source_code_hash = filebase64sha256("${path.module}/main.zip")
-  runtime          = "go1.x"
+  runtime          = "provided.al2"
   timeout          = var.timeout
 
   vpc_config {
